@@ -13,10 +13,11 @@
           <div class="location">{{weather.name}}, {{weather.sys.country}}</div>
           <div class="temp">{{Math.round(weather.main.temp)}}*C</div>
           <div class="weather">{{weather.weather[0].main}}</div>
+          <div class="dt">{{dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString()}}</div>
         </div>
 
         <div class="weather-image">
-          <img v-bind:src="weather_images.sun" alt="">
+          <img :src="image_url + weather.weather[0].icon + '@4x.png'" alt="" > 
         </div>
       </div>
 
@@ -32,12 +33,10 @@ export default {
     return {
       api_key: '2f25834ac09b5895d9a3c7b5333a7faf',
       base_url: 'https://api.openweathermap.org/data/2.5/',
+      image_url: 'http://openweathermap.org/img/wn/',
       query: '',
       weather: '',
-      weather_images: {
-        sun: 'https://media.giphy.com/media/o7R0zQ62m8Nk4/source.gif',
-        rain: 'https://media.giphy.com/media/3osxYzIQRqN4DOEddC/source.gif',
-      },
+      dt: null,
     }
   },
   methods: {
@@ -46,8 +45,8 @@ export default {
         try {
           const response = await fetch(`${this.base_url}weather?q=${this.query}&units=metric&APPID=${this.api_key}`);
           const data = await response.json();
-          console.log(data);
           this.weather = data;
+          this.dt = new Date(data.dt * 1000);
         }catch(err){
           console.error(err);
         }
@@ -66,7 +65,9 @@ export default {
 }
 
 body {
+  background-image: linear-gradient(hsl(230, 19%, 20%),hsl(230, 19%, 40%));
   font-family: 'Noto Serif JP', serif;
+  min-height: 100vh;
 }
 
 #app {
@@ -74,9 +75,9 @@ body {
 }
 
 main {
-  height: 100vh;
+  margin: 0 auto;
+  max-width: 768px;
   padding: 24px;
-  background-image: linear-gradient(hsl(230, 19%, 20%),hsl(230, 19%, 40%));
   color: var(--primary-text);
 }
 
@@ -137,6 +138,11 @@ header {
 .weather-container .weather {
   font-size: 24px;
   font-style: italic;
+  margin-bottom: 12px;
+}
+
+.weather-container .dt {
+  font-size: 20px;
 }
 
 .weather-image img {
